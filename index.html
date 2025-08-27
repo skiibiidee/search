@@ -3,15 +3,22 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sleek Search</title>
+  <title>Search</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="h-screen w-screen bg-gradient-to-br from-gray-950 via-black to-gray-900 text-white flex flex-col">
+<body class="h-screen w-screen bg-gradient-to-br from-purple-950 via-black to-blue-950 text-white flex flex-col">
   <!-- Header -->
   <header class="flex justify-between items-center p-4">
     <div id="time" class="text-xl font-mono"></div>
     <div id="greeting" class="text-lg font-semibold"></div>
   </header>
+
+  <!-- Ping Info -->
+  <div id="systemInfo" class="absolute top-16 right-4 text-sm text-gray-400">
+    <span id="ping">Ping: ...</span>
+    
+  </div>
+  
 
   <!-- Main -->
   <main class="flex flex-col items-center justify-center flex-grow space-y-6">
@@ -25,7 +32,7 @@
       />
       <button 
         id="searchBtn" 
-        class="px-4 py-2 bg-gradient-to-r from-pink-600 to-purple-700 font-bold disabled:opacity-40 disabled:cursor-not-allowed transition-all rounded-r-2xl"
+        class="px-2 py-4 bg-gradient-to-r from-pink-600 to-purple-700 font-bold disabled:opacity-40 disabled:cursor-not-allowed transition-all rounded-r-2xl"
         disabled
       >
         Search
@@ -40,6 +47,10 @@
       <button id="goToSiteBtn" class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 transition shadow">
         🌐 Go to Site
       </button>
+      <button id="fileLoaderBtn" class="p-2 rounded-full bg-white/10 hover:bg-white/20 transition" title="Open HTML File">
+        📂
+      </button>
+      <input type="file" id="fileInput" accept=".html" class="hidden">
     </div>
 
     <!-- Quick links -->
@@ -73,7 +84,7 @@
   </div>
 
   <script>
-    // Update time
+    // ===== Time =====
     function updateTime() {
       const now = new Date();
       document.getElementById("time").textContent = now.toLocaleTimeString();
@@ -81,7 +92,7 @@
     setInterval(updateTime, 1000);
     updateTime();
 
-    // Greeting from localStorage
+    // ===== Greeting =====
     const greeting = document.getElementById("greeting");
     if (localStorage.getItem("anyname")) {
       greeting.textContent = "Welcome back!";
@@ -90,7 +101,7 @@
       localStorage.setItem("anyname", "true");
     }
 
-    // Search logic
+    // ===== Search Logic =====
     const searchInput = document.getElementById("searchInput");
     const searchBtn = document.getElementById("searchBtn");
     const searchGoogleBtn = document.getElementById("searchGoogleBtn");
@@ -100,7 +111,7 @@
       searchBtn.disabled = !searchInput.value.trim();
     });
 
-    // Normal search button (if looks like a query)
+    // Smart search button (Google if not URL)
     searchBtn.addEventListener("click", () => {
       let url = searchInput.value.trim();
       if (!url.startsWith("http")) url = "https://www.google.com/search?q=" + encodeURIComponent(url);
@@ -115,7 +126,7 @@
       }
     });
 
-    // Go to site (force https:// if missing)
+    // Force Go to Site
     goToSiteBtn.addEventListener("click", () => {
       let url = searchInput.value.trim();
       if (!url) return;
@@ -125,12 +136,39 @@
       goToSite(url);
     });
 
-    // Loading + redirect
+    // ===== Loading + Redirect =====
     function goToSite(url) {
       const loading = document.getElementById("loadingScreen");
       loading.classList.remove("hidden");
       setTimeout(() => { window.location.href = url; }, 500);
     }
+
+    // ===== Ping Test =====
+    async function checkPing() {
+      const start = performance.now();
+      try {
+        await fetch("https://www.google.com/generate_204", { mode: "no-cors" });
+        const ms = Math.round(performance.now() - start);
+        document.getElementById('ping').textContent = "Ping: " + ms + " ms";
+      } catch {
+        document.getElementById('ping').textContent = "No connection";
+      }
+    }
+    setInterval(checkPing, 5000);
+    checkPing();
+    const fileBtn = document.getElementById('fileLoaderBtn');
+    const fileInput = document.getElementById('fileInput');
+    fileBtn.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const newWin = window.open();
+        newWin.document.write(ev.target.result);
+      };
+      reader.readAsText(file);
+    });
   </script>
 </body>
 </html>
