@@ -32,11 +32,36 @@
       </button>
     </div>
 
-    <!-- Quick links -->
+    <!-- Extra action buttons -->
     <div class="flex space-x-4">
-      <button onclick="goToSite('https://www.google.com')" class="p-3 rounded-xl bg-white/10 hover:bg-white/20 transition shadow"><img src="https://www.google.com/favicon.ico" class="w-6 h-6"></button>
-      <button onclick="goToSite('https://www.youtube.com')" class="p-3 rounded-xl bg-white/10 hover:bg-white/20 transition shadow"><img src="https://www.youtube.com/favicon.ico" class="w-6 h-6"></button>
-      <button onclick="goToSite('https://www.instagram.com')" class="p-3 rounded-xl bg-white/10 hover:bg-white/20 transition shadow"><img src="https://www.instagram.com/favicon.ico" class="w-6 h-6"></button>
+      <button id="searchGoogleBtn" class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 transition shadow">
+        🔍 Google Search
+      </button>
+      <button id="goToSiteBtn" class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 transition shadow">
+        🌐 Go to Site
+      </button>
+    </div>
+
+    <!-- Quick links -->
+    <div class="grid grid-cols-3 gap-6 mt-6 text-center">
+      <div>
+        <button onclick="goToSite('https://www.google.com')" class="p-3 rounded-xl bg-white/10 hover:bg-white/20 transition shadow flex justify-center">
+          <img src="https://www.google.com/favicon.ico" class="w-6 h-6">
+        </button>
+        <div class="mt-2 text-sm text-gray-300">Google</div>
+      </div>
+      <div>
+        <button onclick="goToSite('https://www.youtube.com')" class="p-3 rounded-xl bg-white/10 hover:bg-white/20 transition shadow flex justify-center">
+          <img src="https://www.youtube.com/favicon.ico" class="w-6 h-6">
+        </button>
+        <div class="mt-2 text-sm text-gray-300">YouTube</div>
+      </div>
+      <div>
+        <button onclick="goToSite('https://www.instagram.com')" class="p-3 rounded-xl bg-white/10 hover:bg-white/20 transition shadow flex justify-center">
+          <img src="https://www.instagram.com/favicon.ico" class="w-6 h-6">
+        </button>
+        <div class="mt-2 text-sm text-gray-300">Instagram</div>
+      </div>
     </div>
   </main>
 
@@ -68,12 +93,35 @@
     // Search logic
     const searchInput = document.getElementById("searchInput");
     const searchBtn = document.getElementById("searchBtn");
+    const searchGoogleBtn = document.getElementById("searchGoogleBtn");
+    const goToSiteBtn = document.getElementById("goToSiteBtn");
+
     searchInput.addEventListener("input", () => {
       searchBtn.disabled = !searchInput.value.trim();
     });
+
+    // Normal search button (if looks like a query)
     searchBtn.addEventListener("click", () => {
       let url = searchInput.value.trim();
       if (!url.startsWith("http")) url = "https://www.google.com/search?q=" + encodeURIComponent(url);
+      goToSite(url);
+    });
+
+    // Force Google Search
+    searchGoogleBtn.addEventListener("click", () => {
+      const query = searchInput.value.trim();
+      if (query) {
+        goToSite("https://www.google.com/search?q=" + encodeURIComponent(query));
+      }
+    });
+
+    // Go to site (force https:// if missing)
+    goToSiteBtn.addEventListener("click", () => {
+      let url = searchInput.value.trim();
+      if (!url) return;
+      if (!url.startsWith("http://") && !url.startsWith("https://")) {
+        url = "https://" + url;
+      }
       goToSite(url);
     });
 
