@@ -168,9 +168,10 @@
       const reader = new FileReader();
       reader.onload = (ev) => {
         // Fully overwrite with uploaded HTML
-        document.open();
-        document.write(ev.target.result);
-        document.close();
+        const blob = new Blob([ev.target.result], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        window.location.href = url;
+
       };
       reader.readAsText(file);
     });
